@@ -20,6 +20,7 @@ public class IdeaDetailActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        //test
 
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
