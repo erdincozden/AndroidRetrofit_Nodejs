@@ -1,5 +1,7 @@
 package com.example.alexr.ideamanager;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -7,9 +9,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.alexr.ideamanager.helpers.SampleContent;
 import com.example.alexr.ideamanager.models.Idea;
+import com.example.alexr.ideamanager.services.IdeaService;
+import com.example.alexr.ideamanager.services.ServiceBuilder;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class IdeaCreateActivity extends AppCompatActivity {
 
@@ -19,6 +28,7 @@ public class IdeaCreateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_idea_create);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+        final Context mContext = this;
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -41,7 +51,21 @@ public class IdeaCreateActivity extends AppCompatActivity {
                 newIdea.setStatus(ideaStatus.getText().toString());
                 newIdea.setOwner(ideaOwner.getText().toString());
 
-                SampleContent.createIdea(newIdea);
+                IdeaService ideaService = ServiceBuilder.buildService(IdeaService.class);
+                Call<Idea> request = ideaService.createIdea(newIdea);
+
+                request.enqueue(new Callback<Idea>() {
+                    @Override
+                    public void onResponse(Call<Idea> request, Response<Idea> response) {
+                        Intent intent = new Intent(mContext, IdeaListActivity.class);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Idea> request, Throwable t) {
+                        Toast.makeText(mContext, "Failed to create item.", Toast.LENGTH_SHORT).show();;
+                    }
+                });
             }
         });
     }
